@@ -1,16 +1,34 @@
 import pyromat as pm
+import numpy as np
 
 air = pm.get('ig.air')
 
-m_doth = 3 # kg/s
+# Hot stream properties
 T_hi = 595 # K
 T_ho = 303 # K
-P_h = 13 # Bar
+m_dot_hot = 3 # kg/s
+P_hot = 13 # Bar
+c_p_hot = air.cp(T=T_hi, p=P_hot)
+C_h = m_dot_hot * c_p_hot
 
-T_hf = (T_hi + T_ho) / 2
-rho_hf = air.d(T=T_hf, p=P_h)
-c_ph =  air.cp(T=T_hf, p=P_h)
-print(rho_hf)
+# Cold stream properties
+T_ci = 293 # K
+m_dot_cold = 5 # kg/s
+P_cold = 1.01325 # Bar
+c_p_cold = air.cp(T=T_ci, p=P_cold)
+C_c = m_dot_cold * c_p_cold
 
-q = m_doth * c_ph * (T_hi - T_ho)
-print(q)
+C_min = min(C_c, C_h)
+C_max = max(C_c, C_h)
+q_max = C_min * (T_hi - T_ci)
+C_r = C_min / C_max
+
+print(c_p_cold, c_p_hot)
+epsilon = (C_h * (T_hi - T_ho)) / (C_min * (T_hi - T_ci))
+
+if C_r < 1:
+    NTU = (1 / (C_r - 1)) * np.log((epsilon - 1) / (epsilon * C_r - 1))
+elif C_r == 1:
+    NTU = (epsilon) / (1 - epsilon)
+
+print(NTU)
