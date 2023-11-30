@@ -31,4 +31,5 @@ if C_r < 1:
 elif C_r == 1:
     NTU = (epsilon) / (1 - epsilon)
 
-print(NTU)
+R_tot = (NTU * C_min) ** -1
+print(R_tot)
