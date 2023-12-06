@@ -66,11 +66,17 @@ df = pd.DataFrame(arr)
 df.columns = ['Mass Flow Rate', 'Cold-Stream Outlet', 'Total Resistance', 'Epsilon/Effectiveness', 'NTU', 'C_r']
 df.to_excel('NTU Analysis.xlsx', index=False)
 
-plt.plot(arr[:, 0], arr[:, 1])
+plt.plot(arr[:, 0], arr[:, 1], label='Cold-flow Outlet Temperature')
+plt.legend()
+plt.xlabel('Cold-flow Mass Flow Rate [kg/s]')
+plt.ylabel('Cold-flow Outlet Temperature, [K]')
+plt.title('Cold-flow Outlet Temperature vs. Mass Flow Rate')
+plt.grid(axis='x', linestyle='--')
 
 sig_mfr = np.arange(10, 50, 5)
 for flow in sig_mfr:
     interp = np.interp(flow, arr[:, 0], arr[:, 1])
     print(f'For a flow of {flow}, we have a T_co of {interp}')
 
+plt.savefig('Figures\\T_co vs m_dot_cold.png')
 plt.show()
