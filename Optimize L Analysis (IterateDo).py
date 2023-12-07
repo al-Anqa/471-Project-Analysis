@@ -15,21 +15,21 @@ def Reynolds(m_dot, viscosity, d_h):
     Re = (4* m_dot) / (np.pi * viscosity * d_h)
     return Re
 
-d_i = np.arange(0.01, 0.85, 0.01)
-arr = np.zeros((len(d_i), 3))
+
+d_o = np.arange(1, 0.34, -0.01)
+arr = np.zeros((len(d_o), 4))
 
 df = pd.DataFrame(arr)
-df.columns = ['Internal Flow Diameter', 'Length', 'Pressure Drop']
+df.columns = ['External Flow Diameter', 'Length', 'Pressure Drop', 'Outer Flow Reynolds']
 
 i=0
 
-for d in d_i:
-    d_o = 0.8
+for out_dim in d_o:
+    d_i = 0.32
     thickness = 0.01
-    d_thickness = d + 2 * thickness
+    d_thickness = d_i + 2 * thickness
 
     epsilon = 0.015
-
 
     # Fixed Parameters
     m_dot_hot = 9.597
@@ -49,9 +49,9 @@ for d in d_i:
     rho_i = CP.PropsSI("Dmass", "T", t_hot_avg, "P", p_hot, 'Air')
     # print(f'Pr_i = {Pr_i}')
 
-    Re_i = Reynolds(m_dot_hot, visc_i, d)
+    Re_i = Reynolds(m_dot_hot, visc_i, d_i)
     Nu_i = DittusBoelter(Re_i, Pr_i, 0.3)
-    h_conv_i = (Nu_i * k_i) / (d)
+    h_conv_i = (Nu_i * k_i) / (d_i)
 
     # print(f'Re_i = {Re_i}')
     # print(f'Nu_i = {Nu_i}')
@@ -63,7 +63,7 @@ for d in d_i:
     k_o = CP.PropsSI("conductivity", "T", t_cold_avg, "P", p_cold, 'Air')
     Pr_o = CP.PropsSI("Prandtl", "T", t_cold_avg, "P", p_cold, 'Air')
 
-    d_ho = d_o - d_thickness
+    d_ho = out_dim - d_thickness
     Re_o = Reynolds(m_dot_cold, visc_o, d_ho)
     Nu_o = DittusBoelter(Re_o, Pr_o, 0.4)
     h_conv_o = (Nu_o * k_o) / (d_ho)
@@ -75,39 +75,40 @@ for d in d_i:
     # Conduction (Thickness)
     # The R_t we calculate here doesn't have an L because we factor it out
     k_cond = 237
-    R_cond = (np.log((d_thickness / 2) / (d / 2))) / (2 * np.pi * k_cond)
+    R_cond = (np.log((d_thickness / 2) / (d_i / 2))) / (2 * np.pi * k_cond)
 
     R_total = 0.02038769
 
-    length = (1 / R_total) * ((1 / (h_conv_i * np.pi * d)) + (R_cond) + (1 / (h_conv_o * np.pi * d_thickness)))
+    length = (1 / R_total) * ((1 / (h_conv_i * np.pi * d_i)) + (R_cond) + (1 / (h_conv_o * np.pi * d_thickness)))
     print(length)
 
-    P_drop = (8 * Haaland(epsilon, d, Re_i) * m_dot_hot ** 2) / (np.pi ** 2 * d ** 5 * rho_i)
+    P_drop = (8 * Haaland(epsilon, d_i, Re_i) * m_dot_hot ** 2) / (np.pi ** 2 * d_i ** 5 * rho_i)
 
-    df['Internal Flow Diameter'].iloc[i] = d
+    df['External Flow Diameter'].iloc[i] = out_dim
     df['Length'].iloc[i] = length
     df['Pressure Drop'].iloc[i] = P_drop
+    df['Outer Flow Reynolds'].iloc[i] = Re_o    
 
     i += 1
 
-df.to_csv('Optimized L Analysis.csv', index=False)
+df.to_csv('Optimized L Analysis (Do).csv', index=False)
 
-plt.figure(1)
-plt.plot(df['Internal Flow Diameter'], df['Length'], label='Hot-flow Pipe Diameter, [m]')
-plt.legend()
-plt.xlabel('Hot-flow Pipe Diameter, [m]')
-plt.ylabel('Heat Exhanger Length [m]')
-plt.title('Heat Exhanger Length vs. Hot-flow Pipe Diameter')
-plt.grid(axis='x', linestyle='--')
+# plt.figure(1)
+# plt.plot(df['Internal Flow Diameter'], df['Length'], label='Hot-flow Pipe Diameter, [m]')
+# plt.legend()
+# plt.xlabel('Hot-flow Pipe Diameter, [m]')
+# plt.ylabel('Heat Exhanger Length [m]')
+# plt.title('Heat Exhanger Length vs. Hot-flow Pipe Diameter')
+# plt.grid(axis='x', linestyle='--')
 
-plt.show()
+# plt.show()
 
-plt.figure(2)
-plt.plot(df['Internal Flow Diameter'], df['Pressure Drop'], label='Pressure Drop [Pa]')
-plt.legend()
-plt.xlabel('Hot-flow Pipe Diameter, [m]')
-plt.ylabel('Pressure Drop, [Pa]')
-plt.title('Pressure Drop [kPa] vs. Hot-flow Pipe Diameter')
-plt.grid(axis='x', linestyle='--')
+# plt.figure(2)
+# plt.plot(df['Internal Flow Diameter'], df['Pressure Drop'], label='Pressure Drop [Pa]')
+# plt.legend()
+# plt.xlabel('Hot-flow Pipe Diameter, [m]')
+# plt.ylabel('Pressure Drop, [Pa]')
+# plt.title('Pressure Drop [kPa] vs. Hot-flow Pipe Diameter')
+# plt.grid(axis='x', linestyle='--')
 
-plt.show()
+# plt.show()

@@ -19,7 +19,6 @@ d_i = np.arange(0.1, 2, 0.02)
 arr = np.zeros((len(d_i), 2))
 i=0
 
-for d in d_i:
 d_o = 2.5
 thickness = 0.01
 d_thickness = d_i + 2 * thickness
@@ -75,7 +74,7 @@ R_total = 0.02038769
 length = (1 / R_total) * ((1 / (h_conv_i * np.pi * d_i)) + (R_cond) + (1 / (h_conv_o * np.pi * d_thickness)))
 print(length)
 
-arr[i, 0] = d
+arr[i, 0] = d_i
 arr[i, 1] = length
 
 i += 1
