@@ -32,11 +32,11 @@ for out_dim in d_o:
     epsilon = 0.015
 
     # Fixed Parameters
-    m_dot_hot = 9.597
+    m_dot_hot = 9.68
     m_dot_cold = 25
 
-    t_hot_avg = 449
-    t_cold_avg = 351.55
+    t_hot_avg = 389.475
+    t_cold_avg = 332.264
 
     p_hot = 450000 # Pa
     p_cold = 101325 # Pa
@@ -77,7 +77,7 @@ for out_dim in d_o:
     k_cond = 237
     R_cond = (np.log((d_thickness / 2) / (d_i / 2))) / (2 * np.pi * k_cond)
 
-    R_total = 0.02038769
+    R_total = 0.024973983029638967 # Taken from NTU Analysis.py
 
     length = (1 / R_total) * ((1 / (h_conv_i * np.pi * d_i)) + (R_cond) + (1 / (h_conv_o * np.pi * d_thickness)))
     print(length)
