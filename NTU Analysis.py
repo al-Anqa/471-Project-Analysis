@@ -8,17 +8,17 @@ from scipy.interpolate import *
 air = pm.get('ig.air')
 
 # Hot stream properties
-T_hi = 595 # K
+T_hi = 475.95 # K, taken from T_16a on EEs
 T_ho = 303 # K
-m_dot_hot = 9.597 # kg/s
-P_hot = 4.5 # Bar
+m_dot_hot = 9.68 # kg/s, taken from m_dot_brayton on EES
+P_hot = 4.531 # Bar, taken from P_16a on EES
 c_p_hot = air.cp(T=T_hi, p=P_hot)
 C_h = m_dot_hot * c_p_hot
 
 # Cold stream properties
 T_ci = 293 # K
 # We set this as an array of values to find which when we hit dimishing returns
-m_dot_cold = np.arange(10, 50, 0.1) # kg/s
+m_dot_cold = np.arange(11, 50, 0.1) # kg/s
 P_cold = 1.01325 # Bar
 c_p_cold = air.cp(T=T_ci, p=P_cold)
 
@@ -65,7 +65,7 @@ for mfr in m_dot_cold:
 # print(arr)
 df = pd.DataFrame(arr)
 df.columns = ['Mass Flow Rate', 'Cold-Stream Outlet', 'Total Resistance', 'Epsilon/Effectiveness', 'NTU', 'C_r']
-df.to_excel('NTU Analysis.xlsx', index=False)
+df.to_csv('NTU Analysis.csv', index=False)
 
 plt.plot(arr[:, 0], arr[:, 1], label='Cold-flow Outlet Temperature')
 plt.legend()
