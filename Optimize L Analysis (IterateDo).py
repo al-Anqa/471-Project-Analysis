@@ -52,10 +52,15 @@ for out_dim in d_o:
     Re_i = Reynolds(m_dot_hot, visc_i, d_i)
     Nu_i = DittusBoelter(Re_i, Pr_i, 0.3)
     h_conv_i = (Nu_i * k_i) / (d_i)
-
-    # print(f'Re_i = {Re_i}')
-    # print(f'Nu_i = {Nu_i}')
-    # print(f'h_conv_i = {h_conv_i}')
+    
+    if i == 0:
+        print(f'k_i = {k_i}')
+        print(f'rho_i = {rho_i}')
+        print(f'Pr_i = {Pr_i}')
+        print(f'visc_i = {visc_i}')
+        print(f'Re_i = {Re_i}')
+        print(f'Nu_i = {Nu_i}')
+        print(f'h_conv_i = {h_conv_i}')
 
     # Cold Stream Flow
 
@@ -68,19 +73,35 @@ for out_dim in d_o:
     Nu_o = DittusBoelter(Re_o, Pr_o, 0.4)
     h_conv_o = (Nu_o * k_o) / (d_ho)
 
-    # print(f'Re_o = {Re_o}')
-    # print(f'Nu_o = {Nu_o}')
-    # print(f'h_conv_o = {h_conv_o}')
-
+    if i == 0:
+        print(f'k_o = {k_o}')
+        print(f'Re_o = {Re_o}')
+        print(f'Pr_o = {Pr_o}')
+        print(f'Nu_o = {Nu_o}')
+        print(f'visc_o = {visc_o}')
+        print(f'd_ho = {d_ho}')
+        print(f'h_conv_o = {h_conv_o}')
+    
     # Conduction (Thickness)
     # The R_t we calculate here doesn't have an L because we factor it out
     k_cond = 237
     R_cond = (np.log((d_thickness / 2) / (d_i / 2))) / (2 * np.pi * k_cond)
 
     R_total = 0.024973983029638967 # Taken from NTU Analysis.py
+    R_i = (1 / (h_conv_i * np.pi * d_i))
+    R_o = (1 / (h_conv_o * np.pi * d_thickness))
 
-    length = (1 / R_total) * ((1 / (h_conv_i * np.pi * d_i)) + (R_cond) + (1 / (h_conv_o * np.pi * d_thickness)))
-    print(length)
+    length = (1 / R_total) * (R_i + R_cond + R_o)
+    # print(length)
+
+    R_i_act = R_i / length
+    R_o_act = R_o / length
+    R_cond_act = R_cond / length
+
+    if i == 0:
+        print(f'R_i_act = {R_i_act}')
+        print(f'R_o_act = {R_o_act}')
+        print(f'R_cond_act = {R_cond_act}')
 
     P_drop = (8 * Haaland(epsilon, d_i, Re_i) * m_dot_hot ** 2) / (np.pi ** 2 * d_i ** 5 * rho_i)
 
